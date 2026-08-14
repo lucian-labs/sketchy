@@ -11,7 +11,10 @@
 import { createParams, createSketch, loadSketch, color } from '@dank-inc/sketchy'
 import type { Sketch, SketchyParams } from '@dank-inc/sketchy'
 
-declare const waveloop: { ready: (...tags: string[]) => Promise<unknown> }
+declare const waveloop: {
+  ready: (...tags: string[]) => Promise<unknown>
+  whenSized: (el: Element, fn: (rect: DOMRect) => void) => () => void
+}
 
 const app = document.getElementById('app') as HTMLElement
 
@@ -186,8 +189,12 @@ function stageSection() {
   controls.append(which, size, running)
   s.append(controls)
 
+  let current = 'orbits'
+
   const load = (name: string) => {
+    current = name
     const box = hud.getBoundingClientRect()
+    if (box.width < 1 || box.height < 1) return
     stage.textContent = ''
     params = createParams({
       element: stage,
@@ -209,7 +216,8 @@ function stageSection() {
     hud.setAttribute('br', `SIZE ${v.toFixed(2)}`)
   })
 
-  requestAnimationFrame(() => load('orbits'))
+  // Boot (and re-fit) off the real box rather than one rAF — see whenSized.
+  waveloop.whenSized(hud, () => load(current))
 }
 
 function anatomySection() {
