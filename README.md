@@ -1,5 +1,7 @@
 # Sketchy!
 
+**[Live demo →](https://sketchy.lucianlabs.ca)** · [npm](https://www.npmjs.com/package/@dank-inc/sketchy) · [all packages](https://lucianlabs.ca/packages/)
+
 A super-dank sketching library built with ♥ and typescript. Inspired heavily by [Canvas Sketch by @mattdesl](https://github.com/mattdesl/canvas-sketch) - the difference is that this is meant to just drop into a webpage. [Here is a live example](https://elijahlucian.ca/artpi) - under construction...
 
 [![npm version](https://badge.fury.io/js/@dank-inc%2Fsketchy.svg)](https://badge.fury.io/js/@dank-inc%2Fsketchy)
