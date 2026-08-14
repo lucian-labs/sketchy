@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>sketchy — @dank-inc/sketchy</title>
+    <meta
+      name="description"
+      content="Interactive demo of @dank-inc/sketchy — a 2D canvas sketch framework where a sketch is a function that returns a frame function."
+    />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="https://ds.lucianlabs.ca/waveloop.css" />
+    <script type="module" src="https://ds.lucianlabs.ca/waveloop.js"></script>
+  </head>
+  <body>
+    <wl-demo
+      sub="sketchy"
+      version="1.1.1"
+      accent="teal"
+      tagline="A 2D canvas sketch framework. A sketch is a function that receives its params and returns a frame function — the closure is where your state lives."
+    >
+      <div id="app"></div>
+    </wl-demo>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
