@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "target": "es5",
+    // stated explicitly: the es5 default lacks WeakMap, and the build only
+    // resolved it by accident, via a lib reference in an installed @types package
+    "lib": ["es2015", "dom"],
     "module": "commonjs",
     "declaration": true,
     "outDir": "lib",

@@ -1,5 +1,5 @@
 import { createSketch } from '../lib'
-import { hsl } from '../lib/helpers'
+import { hsl } from '../lib/helpers/color'
 
 export default createSketch(
   ({ context, circle, setFillStyle, setStrokeStyle, shape, sin }) => {

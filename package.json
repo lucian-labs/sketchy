@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "lint": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.js",
     "clean:win": "del /s /q lib",
     "clean:unix": "rm -rf lib",
     "build": "tsc",

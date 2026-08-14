@@ -46,12 +46,16 @@ export const drawShape = (
   points: [number, number][],
   { fill = false, stroke = false, closed = true }: ShapeOptions = {},
 ) => {
+  // an empty point list is ordinary input (an unfilled trail, a filtered set);
+  // throwing here used to kill the frame, and with it the animation loop
+  if (!points.length) return
+
   context.beginPath()
   const [x, y] = points[0]
 
   context.moveTo(x, y)
-  for (let [x, y] of points) {
-    context.lineTo(x, y)
+  for (let i = 1; i < points.length; i++) {
+    context.lineTo(points[i][0], points[i][1])
   }
   if (closed) context.lineTo(x, y)
 

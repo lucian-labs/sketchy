@@ -9,7 +9,9 @@ jobs:
 
       - uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          # node:test is the test runner, so 14 is no longer enough
+          node-version: 20.x
 
       - run: npm i
       - run: npm run lint
+      - run: npm test

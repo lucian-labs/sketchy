@@ -50,9 +50,7 @@ note: This library and it's helper functions all assume you are workng with norm
 
 ```ts
 import { mapXY } from '@dank-inc/lewps'
-import { createSketch, Vec2 } from '../lib'
-import { hsl, hex } from '../lib/helpers'
-import { createControls } from '../lib/helpers/controls'
+import { createSketch, color, controls, Vec2 } from '@dank-inc/sketchy'
 
 // type the function, and all params are implicitly typed
 export default createSketch((params) => {
@@ -69,7 +67,7 @@ export default createSketch((params) => {
     blur: false,
   }
 
-  const [controls] = createControls({
+  const [keys] = controls.createControls({
     KeyQ: () => state.x--,
     KeyE: () => state.x++,
     Space: () => (state.blur = !state.blur),
@@ -77,20 +75,20 @@ export default createSketch((params) => {
 
   return ({ width, height, t }) => {
     // draw loop function
-    const lastKey = controls.shift()
+    const lastKey = keys.shift()
     if (lastKey) state.lastKey = lastKey
 
     setFillStyle('#111')
     context.fillRect(0, 0, width, height)
 
-    setFillStyle(hex(0.5, 0.5, 0.5))
+    setFillStyle(color.hex(0.5, 0.5, 0.5))
     context.fillText(state.lastKey, 10, height - 100)
 
     for (let [u, v] of points) {
       const x = lerp(u, width, width / 3)
       const y = lerp(v, height, 200)
 
-      setFillStyle(hsl(u, 0.5, 0.5))
+      setFillStyle(color.hsl(u, 0.5, 0.5))
 
       context.fillRect(
         x + state.x * 10,

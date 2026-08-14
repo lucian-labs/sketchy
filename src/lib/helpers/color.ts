@@ -16,12 +16,16 @@ export const rgb: RGBFn = (ru, gu, bu, a = 1) => {
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
 
-export const hex = (ru: number, gu?: number, bu?: number) => {
-  const r = Math.floor(ru * 255).toString(16)
-  const g = Math.floor((gu || ru) * 255).toString(16)
-  const b = Math.floor((bu || ru) * 255).toString(16)
-  return `#${r}${g}${b}`
+// Clamped and zero-padded: an unpadded channel yields a 4 or 5 character string,
+// which is not valid CSS hex and is silently dropped by the canvas.
+const channel = (u: number) => {
+  const byte = Math.round(Math.min(1, Math.max(0, u)) * 255).toString(16)
+  return byte.length < 2 ? `0${byte}` : byte
 }
+
+export const hex = (ru: number, gu?: number, bu?: number) =>
+  // ?? not ||, so a legitimate 0 doesn't fall back to the red channel
+  `#${channel(ru)}${channel(gu ?? ru)}${channel(bu ?? ru)}`
 
 export const createLinearGradient = (
   context: CanvasRenderingContext2D,

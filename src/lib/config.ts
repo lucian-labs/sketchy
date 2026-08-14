@@ -1,4 +1,4 @@
-import { BlendMode, SketchConfig, SketchyParams } from './types'
+import { BlendMode, SketchConfig, SketchData, SketchyParams } from './types'
 import { cos, sin, lerp, r, n } from './maff'
 import { createLinearGradient } from './helpers/color'
 import { arc, drawShape, saver } from './helpers/draw'
@@ -8,42 +8,64 @@ export const createCanvas = (
   el: HTMLElement,
   dimensions?: Vec2,
 ): HTMLCanvasElement => {
+  // Only ever adopt a canvas this library put in this container. The old
+  // document-wide lookup re-parented (and blanked) any canvas on the page.
   const canvas =
-    document.querySelector('canvas') || document.createElement('canvas')
+    el.querySelector<HTMLCanvasElement>(':scope > canvas[data-sketchy]') ||
+    document.createElement('canvas')
 
+  canvas.dataset.sketchy = ''
   el.appendChild(canvas)
 
-  if (dimensions) {
-    const [x, y] = dimensions
-    canvas.width = x
-    canvas.height = y
-  } else {
-    canvas.width = el.clientWidth
-    canvas.height = el.clientHeight
-  }
+  const [width, height] = dimensions || [el.clientWidth, el.clientHeight]
+
+  // Backing store in device pixels, layout in CSS pixels — otherwise the browser
+  // upscales a half-resolution bitmap on every HiDPI screen.
+  const dpr = window.devicePixelRatio || 1
+  canvas.width = Math.round(width * dpr)
+  canvas.height = Math.round(height * dpr)
+  canvas.style.width = `${width}px`
+  canvas.style.height = `${height}px`
 
   return canvas
 }
 
-export const createParams = (config: SketchConfig): SketchyParams => {
+export const createParams = <T = SketchData>(
+  config: SketchConfig<T>,
+): SketchyParams<T> => {
   const id = config.containerId || config.element?.id || 'sketchy'
   const rootElement = config.element || document.getElementById(id)
   if (!rootElement) throw new Error(`No Root Element Found at ${id}`)
 
-  const canvas = createCanvas(rootElement, config.dimensions)
+  // Sizes stay in CSS pixels so sketch maths is unchanged; the canvas itself is
+  // oversampled by dpr and the context is scaled to match.
+  const [width, height] = config.dimensions || [
+    rootElement.clientWidth,
+    rootElement.clientHeight,
+  ]
+  const dpr = window.devicePixelRatio || 1
+
+  const canvas = createCanvas(rootElement, [width, height])
 
   const context = canvas.getContext('2d')
   if (!context) throw new Error(`cannot initialize canvas`)
 
-  const params: SketchyParams = {
-    data: config.data || {},
+  context.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+  const startTime = +new Date()
+
+  const params: SketchyParams<T> = {
+    // an omitted data bag is only typeable as T when the caller took the default
+    data: config.data || ({} as T),
     // config
     requestId: null,
+    dpr,
     time: config.timeOffset || 0,
     dt: 0,
-    startTime: +new Date(),
-    width: canvas.width,
-    height: canvas.height,
+    startTime,
+    lastFrameTime: startTime,
+    width,
+    height,
     animated: config.animate,
     context,
 
@@ -74,7 +96,8 @@ export const createParams = (config: SketchConfig): SketchyParams => {
     abs: Math.abs,
     sin,
     cos,
-    t: () => 0,
+    // reads params.time live, so it tracks the loop instead of returning 0
+    t: (s = 1, o = 0) => 0.001 * params.time * s + o,
     r,
     n,
     lerp,

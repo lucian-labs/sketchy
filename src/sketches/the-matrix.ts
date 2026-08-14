@@ -1,6 +1,6 @@
 import { mapXY } from '@dank-inc/lewps'
 import { createSketch, Vec2 } from '../lib'
-import { hsl, hex } from '../lib/helpers'
+import { hsl, hex } from '../lib/helpers/color'
 import { createControls } from '../lib/helpers/controls'
 
 export default createSketch((params) => {

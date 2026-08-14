@@ -1,16 +1,22 @@
 import { ArcOptions, ShapeOptions } from '../helpers/draw'
 import { Lerpr, Scaler, SinCosFn } from '../maff'
 
-export type Frame = (params: SketchyParams) => void
-export type Sketch = (params: SketchyParams) => Frame
+/** Shape of `params.data` when a sketch does not declare one. */
+export type SketchData = Record<string, unknown>
 
-export type SketchyParams = Canvas2DParams & SketchParams
+export type Frame<T = SketchData> = (params: SketchyParams<T>) => void
+export type Sketch<T = SketchData> = (params: SketchyParams<T>) => Frame<T>
+
+export type SketchyParams<T = SketchData> = Canvas2DParams & SketchParams<T>
 
 export type Canvas2DParams = {
   context: CanvasRenderingContext2D
 
   // render helpers
+  /** The live requestAnimationFrame handle, or null when not animating. */
   requestId: number | null
+  /** Backing-store scale applied to the context (devicePixelRatio). */
+  dpr: number
   setFilter: (val: string) => void
   setFillStyle: (val: string) => void
   setStrokeStyle: (val: string) => void
@@ -31,10 +37,12 @@ export type Canvas2DParams = {
   shape: (points: [number, number][], options?: ShapeOptions) => void
 }
 
-export type SketchParams = {
+export type SketchParams<T = SketchData> = {
   // config
   time: number
   startTime: number
+  /** Timestamp of the previous frame — dt is measured against this, not time. */
+  lastFrameTime: number
   dt: number
   width: number
   height: number
@@ -53,16 +61,16 @@ export type SketchParams = {
 
   lerp: Lerpr
   stop: () => boolean
-  data: Record<string, any>
+  data: T
 }
 
-export type SketchConfig = {
+export type SketchConfig<T = SketchData> = {
   containerId?: string
   element?: HTMLElement
   animate?: boolean
   dimensions?: [number, number]
   timeOffset?: number
-  data?: Record<string, any>
+  data?: T
 }
 
 export type BlendMode =

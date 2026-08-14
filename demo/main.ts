@@ -1,12 +1,4 @@
-/* sketchy demo — https://sketchy.lucianlabs.ca
- *
- * Layout note: sketchy's createCanvas resolves its target with
- * document.querySelector('canvas'), which finds the FIRST canvas in the whole
- * document rather than one inside the container it was handed. This page
- * therefore keeps the sketch stage as its only <canvas> — no wl-scope, no
- * histogram — so the framework binds to the element we intend. It is a real
- * constraint of the published library, recorded in the review.
- */
+/* sketchy demo — https://sketchy.lucianlabs.ca */
 
 import { createParams, createSketch, loadSketch, color } from '@dank-inc/sketchy'
 import type { Sketch, SketchyParams } from '@dank-inc/sketchy'
@@ -51,9 +43,9 @@ const orbits: Sketch = createSketch(({ width, height, TAU, sin, cos, data }) => 
         const x = width / 2 + Math.cos(angle) * radius
         const y = height / 2 + Math.sin(angle) * radius * 0.55
         const r = 2 + sin(u + time * 0.3, 3, 6, 6) * (data.size as number)
-        circle(x, y, Math.max(0.5, r), {
-          fill: color.hsl((au + u * 0.15 + time * 0.02) % 1, 0.55, 0.35 + u * 0.35, 0.85),
-        })
+        // ArcOptions.fill is a boolean flag — the colour goes on the context
+        context.fillStyle = color.hsl((au + u * 0.15 + time * 0.02) % 1, 0.55, 0.35 + u * 0.35, 0.85)
+        circle(x, y, Math.max(0.5, r), { fill: true })
       }
     }
     void cos
@@ -75,6 +67,7 @@ const lattice: Sketch = createSketch(({ width, height, data }) => {
         const cy = v * height
         const s = (4 + wob * 6) * (data.size as number)
         if (s <= 0.4) continue
+        context.fillStyle = color.hsl((0.45 + wob * 0.12) % 1, 0.6, 0.3 + Math.abs(wob) * 0.4, 0.9)
         shape(
           [
             [cx - s, cy],
@@ -82,7 +75,7 @@ const lattice: Sketch = createSketch(({ width, height, data }) => {
             [cx + s, cy],
             [cx, cy + s],
           ],
-          { fill: color.hsl((0.45 + wob * 0.12) % 1, 0.6, 0.3 + Math.abs(wob) * 0.4, 0.9) }
+          { fill: true }
         )
       }
     }
@@ -266,6 +259,6 @@ function apiSection() {
     { name: 'params.createGradient', kind: 'function', signature: '(c1, c2, x1, y1, x2, y2) => CanvasGradient', about: 'Two-stop linear gradient.' },
     { name: 'params.setBlendMode', kind: 'function', signature: '(mode: BlendMode) => void', about: 'Sets globalCompositeOperation from a typed list.' },
     { name: 'color', kind: 'namespace', signature: 'hsl, rgb, hex, createLinearGradient, blendModes', about: 'Colour helpers taking 0..1 components.' },
-    { name: 'ctx / controls / filter / text', kind: 'namespace', signature: 'various', about: 'Further helper namespaces re-exported from the entry point.' },
+    { name: 'controls / filter / text', kind: 'namespace', signature: 'various', about: 'Further helper namespaces re-exported from the entry point.' },
   ]
 }
